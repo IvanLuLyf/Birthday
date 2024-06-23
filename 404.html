@@ -233,27 +233,28 @@
 <div id="empty">?</div>
 <script>
     (function () {
-        const container = document.getElementById('container');
+        const $c = document.getElementById('container');
+        const $e = document.getElementById('empty');
         const $n = document.getElementById('n');
 
         const BD_SHEET = [262, 262, 294, 262, 349, 330, 262, 262, 294, 262, 392, 349, 262, 262, 523, 440, 349, 330, 294, 466, 466, 440, 349, 392, 349];
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-        const voiceEffect = (frequency) => {
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.type = 'triangle';
-            oscillator.frequency.value = frequency;
-            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.01);
-            oscillator.start(audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
-            oscillator.stop(audioCtx.currentTime + 1);
-        }
         const ps = (sheet = []) => {
             let i = 0;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            const voiceEffect = (frequency) => {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.type = 'triangle';
+                oscillator.frequency.value = frequency;
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.01);
+                oscillator.start(audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+                oscillator.stop(audioCtx.currentTime + 1);
+            }
             const flag = setInterval(() => {
                 if (i >= sheet.length) {
                     clearInterval(flag);
@@ -284,10 +285,13 @@
                 });
             }
         };
+        $e.addEventListener('click', () => {
+            notify('?');
+        });
         const d = JSON.parse(decodeURIComponent(atob(param || 'JTdCJTIybiUyMiUzQSUyMkl2YW5MdSUyMiUyQyUyMmQlMjIlM0ElMjI3LTElMjIlN0Q=')));
         if (nowStr === d.d) {
             const t = `${d.n}${decodeURIComponent('%E7%94%9F%E6%97%A5%E5%BF%AB%E4%B9%90!')}`;
-            container.dataset.started = document.title = $n.innerText = t;
+            $c.dataset.started = document.title = $n.innerText = t;
             ps(BD_SHEET);
             notify(t);
         }
