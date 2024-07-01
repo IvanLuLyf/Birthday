@@ -173,6 +173,17 @@
             background-color: #3f51b5;;
         }
 
+        .candle:after {
+            content: "";
+            position: absolute;
+            top: -9px;
+            left: 6px;
+            width: 4px;
+            height: 14px;
+            background: #333;
+            border-radius: 8px;
+        }
+
         .flame {
             position: absolute;
             background-color: orange;
@@ -186,6 +197,14 @@
             box-shadow: 0 0 10px var(--flame-color-5), 0 0 20px var(--flame-color-5), 0 0 60px var(--flame-color-5), 0 0 80px var(--flame-color-5);
             transform-origin: 50% 90%;
             animation: flicker 1s ease-in-out alternate infinite;
+        }
+
+        #container.blowing .flame {
+            animation: flicker .3s ease-in-out alternate infinite;
+        }
+
+        #container.over .flame {
+            display: none;
         }
 
         @keyframes flicker {
@@ -255,14 +274,52 @@
                 gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
                 oscillator.stop(audioCtx.currentTime + 1);
             }
-            const flag = setInterval(() => {
-                if (i >= sheet.length) {
-                    clearInterval(flag);
-                    return;
+            return new Promise((resolve) => {
+                const flag = setInterval(() => {
+                    if (i >= sheet.length) {
+                        clearInterval(flag);
+                        resolve();
+                        return;
+                    }
+                    voiceEffect(sheet[i])
+                    i++;
+                }, 500);
+            });
+        }
+        const blow = () => {
+            if (!navigator.mediaDevices) return;
+            const blowCtx = {count: 8};
+            navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioContext = new AudioContext();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                analyser.fftSize = 256;
+                const isBlowing = () => {
+                    const bufferLength = analyser.frequencyBinCount;
+                    const dataArray = new Uint8Array(bufferLength);
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+                    return (sum / bufferLength) > 55;
                 }
-                voiceEffect(sheet[i])
-                i++;
-            }, 500);
+                const flag = setInterval(() => {
+                    if (isBlowing()) {
+                        $c.classList.add('blowing');
+                        blowCtx.count--;
+                    } else {
+                        $c.classList.remove('blowing');
+                        blowCtx.count++;
+                    }
+                    if (blowCtx.count <= 0) {
+                        clearInterval(flag);
+                        $c.classList.add('over');
+                    } else if (blowCtx.count >= 10) {
+                        blowCtx.count = 10;
+                    }
+                }, 200);
+            });
         }
         const now = new Date();
         const nowStr = `${now.getMonth() + 1}-${now.getDate()}`;
@@ -285,14 +342,11 @@
                 });
             }
         };
-        $e.addEventListener('click', () => {
-            notify('?');
-        });
         const d = JSON.parse(decodeURIComponent(atob(param || 'JTdCJTIybiUyMiUzQSUyMkl2YW5MdSUyMiUyQyUyMmQlMjIlM0ElMjI3LTElMjIlN0Q=')));
         if (nowStr === d.d) {
             const t = `${d.n}${decodeURIComponent('%E7%94%9F%E6%97%A5%E5%BF%AB%E4%B9%90!')}`;
             $c.dataset.started = document.title = $n.innerText = t;
-            ps(BD_SHEET);
+            ps(BD_SHEET).then(() => blow());
             notify(t);
         }
     })();
