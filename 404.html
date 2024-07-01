@@ -302,7 +302,7 @@
                     analyser.getByteFrequencyData(dataArray);
                     let sum = 0;
                     for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-                    return (sum / bufferLength) > 55;
+                    return (sum / bufferLength) > 45;
                 }
                 const flag = setInterval(() => {
                     if (isBlowing()) {
