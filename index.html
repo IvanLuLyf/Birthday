@@ -15,10 +15,10 @@
             background-color: #4d3f65;
             --icing-color: #ffdae6;
             --icing-color-2: #fff2f6;
-            --flame-color-2: rgba(255, 165, 0, 0.2);
-            --flame-color-3: rgba(255, 165, 0, 0.3);
-            --flame-color-4: rgba(255, 165, 0, 0.4);
-            --flame-color-5: rgba(255, 165, 0, 0.5);
+            --flame-color-2: rgba(255, 165, 0, 0.3);
+            --flame-color-3: rgba(255, 165, 0, 0.4);
+            --flame-color-4: rgba(255, 165, 0, 0.5);
+            --flame-color-5: rgba(255, 165, 0, 0.6);
         }
 
         #container {
@@ -46,6 +46,25 @@
 
         #container[data-started] + #empty {
             display: none;
+        }
+
+        .empty-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            height: 360px;
+            width: 360px;
+            font-size: 270px;
+            background: #9892ff;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 20px 8px #9892ff;
+            transition: transform ease 0.3s;
+        }
+
+        .empty-btn:active {
+            transform: scale(0.9);
         }
 
         .main-text {
@@ -249,7 +268,9 @@
     </div>
     <div class="main-text"><span id="n"></span>🎉🎉🎉</div>
 </div>
-<div id="empty">?</div>
+<div id="empty">
+    <div class="empty-btn">?</div>
+</div>
 <script>
     (function () {
         const $c = document.getElementById('container');
@@ -344,10 +365,13 @@
         };
         const d = JSON.parse(decodeURIComponent(atob(param || 'JTdCJTIybiUyMiUzQSUyMkl2YW5MdSUyMiUyQyUyMmQlMjIlM0ElMjI3LTElMjIlN0Q=')));
         if (nowStr === d.d) {
-            const t = `${d.n}${decodeURIComponent('%E7%94%9F%E6%97%A5%E5%BF%AB%E4%B9%90!')}`;
-            $c.dataset.started = document.title = $n.innerText = t;
-            ps(BD_SHEET).then(() => blow());
-            notify(t);
+            document.title = $e.querySelector('.empty-btn').innerText = '!';
+            $e.addEventListener('click', () => {
+                const t = `${d.n}${decodeURIComponent('%E7%94%9F%E6%97%A5%E5%BF%AB%E4%B9%90!')}`;
+                $c.dataset.started = document.title = $n.innerText = t;
+                ps(BD_SHEET).then(() => blow());
+                notify(t);
+            });
         }
     })();
 </script>
