@@ -84,6 +84,7 @@
 </div>
 <script>
     (function () {
+        const url = new URL(location);
         const $form = document.getElementById('form_query');
         const $result = document.getElementById('result');
         $form.addEventListener('submit', (ev) => {
@@ -93,7 +94,13 @@
             const d = `${date.getMonth() + 1}-${date.getDate()}`;
             const n = el['name'].value;
             const p = btoa(encodeURIComponent(JSON.stringify({d, n})));
-            $result.innerHTML = `<a href="${location.href.replace('create.html', p)}" target="_blank">${location.href.replace('create.html', p)}</a>`;
+            if (location.hostname === 'localhost') {
+                url.pathname = url.pathname.replace('create.html', '');
+                url.searchParams.set('d', p);
+            } else {
+                url.pathname = url.pathname.replace('create.html', p);
+            }
+            $result.innerHTML = `<a href="${url.toString()}" target="_blank">${url.toString()}</a>`;
         });
     })();
 </script>
